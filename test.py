@@ -1,9 +1,13 @@
 from os import listdir
 import cv2
 import numpy as np
+import keras
 import pickle
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.model_selection import train_test_split
+from keras._tf_keras import keras
+from tensorflow.keras.layers import Input,Flatten,Dense,Dropout
+
 from keras.applications.vgg16 import VGG16
 from keras.layers import Input, Flatten, Dense, Dropout
 from keras.models import Model
@@ -11,13 +15,14 @@ from keras.callbacks import ModelCheckpoint
 import matplotlib.pyplot as plt
 import random
 from keras.models import  load_model
+from tensorflow.keras.utils import load_img
 import sys
-
+from tkinter import *
 cap = cv2.VideoCapture(0)
 
 # Dinh nghia class
-class_name = ['00000','10000','20000','50000']
-#class_name = ['00000','10000','100000','20000','200000','50000','500000']
+#class_name = ['00000','10000','20000','50000']
+class_name = ['00000','10000','100000','20000','200000','50000','500000']
 def get_model():
     model_vgg16_conv = VGG16(weights='imagenet', include_top=False)
 
@@ -35,7 +40,7 @@ def get_model():
     x = Dropout(0.5)(x)
     x = Dense(4096, activation='relu', name='fc2')(x)
     x = Dropout(0.5)(x)
-    x = Dense(4, activation='softmax', name='predictions')(x)
+    x = Dense(7, activation='softmax', name='predictions')(x)
 
     # Compile
     my_model = Model(inputs=input, outputs=x)
@@ -45,46 +50,65 @@ def get_model():
 
 # Load weights model da train
 my_model = get_model()
-my_model.load_weights("weights-42-0.99.hdf5")
-
-while(True):
+#my_model.load_weights("weights-42-0.99.hdf5")
+my_model.load_weights("weights-44-0.97.keras")
+def test():
+    while(True):
     # Capture frame-by-frame
-    #
-
-    ret, image_org = cap.read()
-    if not ret:
-        continue
-    image_org = cv2.resize(image_org, dsize=None,fx=0.5,fy=0.5)
-    # Resize
-    image = image_org.copy()
-    image = cv2.resize(image, dsize=(128, 128))
-    image = image.astype('float')*1./255
-    # Convert to tensor
-    image = np.expand_dims(image, axis=0)
-
-    # Predict
-    predict = my_model.predict(image)
-    print("This picture is: ", class_name[np.argmax(predict[0])], (predict[0]))
-    print(np.max(predict[0],axis=0))
-    if (np.max(predict)>=0.8) and (np.argmax(predict[0])!=0):
 
 
-        # Show image
-        font = cv2.FONT_HERSHEY_SIMPLEX
-        org = (50, 50)
-        fontScale = 1.5
-        color = (0, 255, 0)
-        thickness = 2
+        ret, image_org = cap.read()
+        if not ret:
+            continue
+        image_org = cv2.resize(image_org, dsize=None,fx=0.5,fy=0.5)
+        # Resize
+        image = image_org.copy()
+        image = cv2.resize(image, dsize=(128, 128))
+        image = image.astype('float')*1./255
+        # Convert to tensor
+        image = np.expand_dims(image, axis=0)
 
-        cv2.putText(image_org, class_name[np.argmax(predict)], org, font,
+        # Predict
+        predict = my_model.predict(image)
+        print("This picture is: ", class_name[np.argmax(predict[0])], (predict[0]))
+        print(np.max(predict[0],axis=0))
+        if (np.max(predict)>=0.8) and (np.argmax(predict[0])!=0):
+
+
+            # Show image
+            font = cv2.FONT_HERSHEY_SIMPLEX
+            org = (50, 50)
+            fontScale = 1.5
+            color = (0, 255, 0)
+            thickness = 2
+
+            cv2.putText(image_org, class_name[np.argmax(predict)], org, font,
                     fontScale, color, thickness, cv2.LINE_AA)
 
-    cv2.imshow("Picture", image_org)
+        cv2.imshow("Picture", image_org)
 
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+    cap.release()
+    cv2.destroyAllWindows()
+    return
 
+window=Tk()
+window.geometry("640x640")
+button=Button(window,text="Start Identify",command=test,font=("Comic Sans",30))
+
+button.pack()
+button.place(x=200,y=220)
+button2=Button(window,text="Close",command=window.destroy,font=("Comic Sans",30))
+button2.pack()
+button2.place(x=200,y=300)
+photo = PhotoImage(file='camera.png')
+label = Label(window,text="Nhan dang tien VN",font=('Arial',40,'bold'),
+            fg = 'green', relief=RAISED, bd=5, padx=10, pady=10, image = photo, compound = 'bottom')
+label.place(x=100,y=10)
+label2=Label(window,text="An Q de dung camera",font=('Arial',40,'underline'))
+label2.place(x=100,y=400)
+window.mainloop()
 # When everything done, release the capture
-cap.release()
-cv2.destroyAllWindows()
+
 
