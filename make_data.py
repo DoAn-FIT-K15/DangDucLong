@@ -39,19 +39,22 @@ def makedata():
     return
 
 window = Tk()
-window.geometry("640x640")
-button=Button(window,text="Tao du lieu!!",command=makedata,font=("Comic Sans",30))
-
+window.geometry("680x640")
+photo2=PhotoImage(file='button.png')
+button=Button(window,text="Begin!!",command=makedata,font=("Comic Sans",30),image=photo2,compound='left')
 button.pack()
-button.place(x=200,y=220)
-button2=Button(window,text="Dong cua so",command=window.destroy,font=("Comic Sans",30))
+button.place(x=250,y=270)
+label3=Label(window,text="Make Data For Model",font=('Arial',30))
+label3.place(x=150,y=200)
+photo3=PhotoImage(file='door.png')
+button2=Button(window,text="Close",command=window.destroy,font=("Comic Sans",30),image=photo3,compound='left')
 button2.pack()
-button2.place(x=200,y=300)
+button2.place(x=260,y=350)
 photo = PhotoImage(file='camera.png')
 label1 = Label(window,text="Nhan dang tien VN",font=('Arial',40,'bold'),
             fg = 'green', relief=RAISED, bd=5, padx=10, pady=10, image = photo, compound = 'bottom')
 label1.place(x=100,y=10)
-label2=Label(window,text="An Q de dung camera",font=('Arial',40,'underline'))
-label2.place(x=100,y=400)
+label2=Label(window,text="An 'q' de dung camera",font=('Arial',40,'underline'))
+label2.place(x=100,y=450)
 window.mainloop()
 # When everything done, release the capture
