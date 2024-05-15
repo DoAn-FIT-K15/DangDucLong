@@ -2,6 +2,7 @@ from os import listdir
 import cv2
 import numpy as np
 import pickle
+import keras
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.model_selection import train_test_split
 from keras.applications.vgg16 import VGG16
@@ -10,7 +11,8 @@ from keras.models import Model
 from keras.callbacks import ModelCheckpoint
 import matplotlib.pyplot as plt
 import random
-from keras.preprocessing.image import ImageDataGenerator
+from tkinter import *
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 raw_folder = "data/"
 def save_data(raw_folder=raw_folder):
@@ -63,7 +65,7 @@ def load_data():
 
     return pixels, labels
 
-save_data()
+#save_data()
 X,y = load_data()
 #random.shuffle(X)
 X_train, X_test, y_train, y_test = train_test_split( X, y, test_size=0.2, random_state=100)
@@ -88,7 +90,7 @@ def get_model():
     x = Dropout(0.5)(x)
     x = Dense(4096, activation='relu', name='fc2')(x)
     x = Dropout(0.5)(x)
-    x = Dense(4, activation='softmax', name='predictions')(x)
+    x = Dense(7, activation='softmax', name='predictions')(x)
 
     # Compile
     my_model = Model(inputs=input, outputs=x)
@@ -98,7 +100,7 @@ def get_model():
 
 vggmodel = get_model()
 
-filepath="weights-{epoch:02d}-{val_accuracy:.2f}.hdf5"
+filepath="weights-{epoch:02d}-{val_accuracy:.2f}.keras"
 checkpoint = ModelCheckpoint(filepath, monitor='val_accuracy', verbose=1, save_best_only=True, mode='max')
 callbacks_list = [checkpoint]
 
@@ -112,13 +114,13 @@ aug = ImageDataGenerator(rotation_range=20, zoom_range=0.1,
 
 aug_val = ImageDataGenerator(rescale=1./255)
 
-vgghist=vggmodel.fit_generator(aug.flow(X_train, y_train, batch_size=64),
+vgghist=vggmodel.fit(aug.flow(X_train, y_train, batch_size=64),
                                epochs=50,  # steps_per_epoch=len(X_train)//64,
                                validation_data=aug.flow(X_test,y_test,
                                batch_size=64),
                                callbacks=callbacks_list)
 
-vggmodel.save("vggmodel.h5")
+vggmodel.save("vggmodel.keras")
 
 
 
