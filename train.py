@@ -27,7 +27,7 @@ def save_data(raw_folder=raw_folder):
     for folder in listdir(raw_folder):
         if folder!='.DS_Store':
             print("Folder=",folder)
-            # Lặp qua các file trong từng thư mục chứa các em
+            # Lặp qua các file trong từng thư mục chứa
             for file in listdir(raw_folder  + folder):
                 if file!='.DS_Store':
                     print("File=", file)
@@ -115,7 +115,7 @@ aug = ImageDataGenerator(rotation_range=20, zoom_range=0.1,
 aug_val = ImageDataGenerator(rescale=1./255)
 
 vgghist=vggmodel.fit(aug.flow(X_train, y_train, batch_size=64),
-                               epochs=50,  # steps_per_epoch=len(X_train)//64,
+                               epochs=100,  # steps_per_epoch=len(X_train)//64,
                                validation_data=aug.flow(X_test,y_test,
                                batch_size=64),
                                callbacks=callbacks_list)
